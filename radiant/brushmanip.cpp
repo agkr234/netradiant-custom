@@ -141,7 +141,34 @@ void Brush_ConstructPrism( Brush& brush, const AABB& bounds, std::size_t sides, 
 
 	brush.addPlane( planepts[0], planepts[1], planepts[2], shader, projection );
 
-	for ( std::size_t i = 0 ; i < sides ; ++i )
+	std::vector<Vector3> points;
+	double angle = 2 * 3.1415926535897931 / sides;
+
+	int i;
+
+	for (i = 0; i < sides; i++)
+	{
+		int next = (i + 1) % sides;
+		double a = i * angle;
+		double a2 = next * angle;
+
+		planepts[0][x] = static_cast<float>(mid[x] + radius * cos(a));
+		planepts[0][y] = static_cast<float>(mid[y] + radius * sin(a));
+		planepts[0][z] = mins[z];
+
+		planepts[1][x] = planepts[0][x];
+		planepts[1][y] = planepts[0][y];
+		planepts[1][z] = maxs[z];
+
+		planepts[2][x] = static_cast<float>(mid[x] + radius * cos(a2));
+		planepts[2][y] = static_cast<float>(mid[y] + radius * sin(a2));
+		planepts[2][z] = mins[z];
+
+		brush.addPlane(planepts[0], planepts[1], planepts[2], shader, projection);
+	}
+
+	//age: original
+	/*for ( std::size_t i = 0 ; i < sides ; ++i )
 	{
 		const double sv = sin( i * c_2pi / sides );
 		const double cv = cos( i * c_2pi / sides );
@@ -159,7 +186,7 @@ void Brush_ConstructPrism( Brush& brush, const AABB& bounds, std::size_t sides, 
 		planepts[2][z] = maxs[z];
 
 		brush.addPlane( planepts[0], planepts[1], planepts[2], shader, projection );
-	}
+	}*/
 }
 
 const std::size_t c_brushCone_minSides = 3;
@@ -186,13 +213,40 @@ void Brush_ConstructCone( Brush& brush, const AABB& bounds, std::size_t sides, c
 	const Vector3& mid = bounds.origin;
 	Vector3 planepts[3];
 
+	std::vector<Vector3> points;
+	double angle = 2 * 3.1415926535897931 / sides;
+
 	planepts[0][0] = mins[0]; planepts[0][1] = mins[1]; planepts[0][2] = mins[2];
 	planepts[1][0] = maxs[0]; planepts[1][1] = mins[1]; planepts[1][2] = mins[2];
 	planepts[2][0] = maxs[0]; planepts[2][1] = maxs[1]; planepts[2][2] = mins[2];
 
 	brush.addPlane( planepts[0], planepts[1], planepts[2], shader, projection );
 
-	for ( std::size_t i = 0 ; i < sides ; ++i )
+	int i;
+
+	for (i = 0; i < sides; i++)
+	{
+		int next = (i + 1) % sides;
+		double a = i * angle;
+		double a2 = next * angle;
+
+		planepts[0][0] = static_cast<float>(mid[0] + radius * cos(a));
+		planepts[0][1] = static_cast<float>(mid[1] + radius * sin(a));
+		planepts[0][2] = mins[2];
+
+		planepts[1][0] = mid[0];
+		planepts[1][1] = mid[1];
+		planepts[1][2] = maxs[2];
+
+		planepts[2][0] = static_cast<float>(mid[0] + radius * cos(a2));
+		planepts[2][1] = static_cast<float>(mid[1] + radius * sin(a2));
+		planepts[2][2] = mins[2];
+
+		brush.addPlane(planepts[0], planepts[1], planepts[2], shader, projection);
+	}
+
+	//age: original
+	/*for ( std::size_t i = 0 ; i < sides ; ++i )
 	{
 		double sv = sin( i * 3.14159265 * 2 / sides );
 		double cv = cos( i * 3.14159265 * 2 / sides );
@@ -214,7 +268,7 @@ void Brush_ConstructCone( Brush& brush, const AABB& bounds, std::size_t sides, c
 		planepts[2][2] = maxs[2];
 
 		brush.addPlane( planepts[0], planepts[1], planepts[2], shader, projection );
-	}
+	}*/
 }
 
 const std::size_t c_brushSphere_minSides = 3;
