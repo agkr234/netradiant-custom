@@ -211,6 +211,9 @@ typedef struct {
 		// little-endian "IBSP"
 
 #define QL_BSP_VERSION			47
+
+#define IGW_BSP_VERSION			48
+
 // ***********************************************************
 
 // there shouldn't be any problem with increasing these values at the
@@ -328,6 +331,12 @@ typedef struct {
 	int			planeNum;			// positive plane side faces out of the leaf
 	int			shaderNum;
 } q3_dbrushside_t;
+
+typedef struct {
+	int			planeNum;			// positive plane side faces out of the leaf
+	int			shaderNum;
+	int			surfaceNum;
+} q3r_dbrushside_t;
 
 typedef struct {
 	int			firstSide;

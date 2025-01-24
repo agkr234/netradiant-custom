@@ -53,6 +53,9 @@ extern	q3_dbrush_t		*q3_dbrushes;//[Q3_MAX_MAP_BRUSHES];
 extern	int				q3_numbrushsides;
 extern	q3_dbrushside_t	*q3_dbrushsides;//[Q3_MAX_MAP_BRUSHSIDES];
 
+extern	int				q3r_numbrushsides;
+extern	q3r_dbrushside_t* q3r_dbrushsides;//[Q3_MAX_MAP_BRUSHSIDES];
+
 extern	int				q3_numLightBytes;
 extern	byte			*q3_lightBytes;//[Q3_MAX_MAP_LIGHTING];
 

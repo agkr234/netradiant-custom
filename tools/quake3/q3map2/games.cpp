@@ -918,26 +918,39 @@ struct game_ja : game_sof2
 	}
 };
 
+struct game_igwarlord : game_default
+{
+	game_igwarlord() {
+		arg = "igwarlord";
+		gamePath = "base";
+		homeBasePath = ".igw";
+		magic = "igwarlord";
+		bspVersion = 48;
+		load = LoadIBSPFile_IGW;
+		write = WriteIBSPFile_IGW;
+	}
+};
 
 
 const std::vector<game_t> g_games = { game_quake3(),
-                                      game_quakelive(),
-                                      game_nexuiz(),
-                                      game_xonotic(),
-                                      game_tremulous(),
-                                      game_unvanquished(),
-                                      game_tenebrae(),
-                                      game_wolf(),
-                                      game_wolfet(),
-                                      game_etut(),
-                                      game_ef(),
-                                      game_qfusion(),
-                                      game_reaction(),
-                                      game_darkplaces(),
-                                      game_dq(),
-                                      game_prophecy(),
-                                      game_sof2(),
-                                      game_jk2(),
-                                      game_ja(),
+									  game_quakelive(),
+									  game_nexuiz(),
+									  game_xonotic(),
+									  game_tremulous(),
+									  game_unvanquished(),
+									  game_tenebrae(),
+									  game_wolf(),
+									  game_wolfet(),
+									  game_etut(),
+									  game_ef(),
+									  game_qfusion(),
+									  game_reaction(),
+									  game_darkplaces(),
+									  game_dq(),
+									  game_prophecy(),
+									  game_sof2(),
+									  game_jk2(),
+									  game_ja(),
+									  game_igwarlord(),
                                     };
 const game_t *g_game = &g_games[0];

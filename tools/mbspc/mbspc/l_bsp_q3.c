@@ -70,6 +70,9 @@ q3_dbrush_t		*q3_dbrushes;//[Q3_MAX_MAP_BRUSHES];
 int				q3_numbrushsides;
 q3_dbrushside_t	*q3_dbrushsides;//[Q3_MAX_MAP_BRUSHSIDES];
 
+int				q3r_numbrushsides;
+q3r_dbrushside_t* q3r_dbrushsides;//[Q3_MAX_MAP_BRUSHSIDES];
+
 int				q3_numLightBytes;
 byte			*q3_lightBytes;//[Q3_MAX_MAP_LIGHTING];
 
@@ -133,6 +136,9 @@ void Q3_FreeMaxBSP(void)
 	if (q3_dbrushsides) FreeMemory(q3_dbrushsides);
 	q3_dbrushsides = NULL;
 	q3_numbrushsides = 0;
+	if (q3r_dbrushsides) FreeMemory(q3r_dbrushsides);
+	q3r_dbrushsides = NULL;
+	q3r_numbrushsides = 0;
 	if (q3_lightBytes) FreeMemory(q3_lightBytes);
 	q3_lightBytes = NULL;
 	q3_numLightBytes = 0;
@@ -589,9 +595,29 @@ void CountTriangles( void ) {
 
 /*
 =============
+IGW_ConvertBSPData
+=============
+*/
+static void IGW_ConvertBSPData(void)
+{
+	int i, j;
+
+	q3_numbrushsides = q3r_numbrushsides;
+	q3_dbrushsides = GetMemory(q3_numbrushsides * sizeof(q3_dbrushside_t));
+	for (i = 0; i < q3_numbrushsides; i++) {
+		q3_dbrushsides[i].planeNum = q3r_dbrushsides[i].planeNum;
+		q3_dbrushsides[i].shaderNum = q3r_dbrushsides[i].shaderNum;
+	}
+}
+
+/*
+=============
 Q3_LoadBSPFile
 =============
 */
+
+extern qboolean igwarlord;
+
 void	Q3_LoadBSPFile(struct quakefile_s *qf)
 {
 	q3_dheader_t	*header;
@@ -607,8 +633,8 @@ void	Q3_LoadBSPFile(struct quakefile_s *qf)
 	if ( header->ident != Q3_BSP_IDENT && header->ident != QL_BSP_IDENT ) {
 		Error( "%s is not a IBSP file", qf->filename );
 	}
-	if ( header->version != Q3_BSP_VERSION && header->version != QL_BSP_VERSION ) {
-		Error( "%s is version %i, not (%i or %i)", qf->filename, header->version, Q3_BSP_VERSION, QL_BSP_VERSION );
+	if ( header->version != Q3_BSP_VERSION && header->version != QL_BSP_VERSION && header->version != IGW_BSP_VERSION ) {
+		Error( "%s is version %i, not (%i, %i, or %i)", qf->filename, header->version, Q3_BSP_VERSION, QL_BSP_VERSION, IGW_BSP_VERSION);
 	}
 
 	q3_numShaders = Q3_CopyLump( header, Q3_LUMP_SHADERS, (void *) &q3_dshaders, sizeof(q3_dshader_t) );
@@ -619,7 +645,12 @@ void	Q3_LoadBSPFile(struct quakefile_s *qf)
 	q3_numleafsurfaces = Q3_CopyLump( header, Q3_LUMP_LEAFSURFACES, (void *) &q3_dleafsurfaces, sizeof(q3_dleafsurfaces[0]) );
 	q3_numleafbrushes = Q3_CopyLump( header, Q3_LUMP_LEAFBRUSHES, (void *) &q3_dleafbrushes, sizeof(q3_dleafbrushes[0]) );
 	q3_numbrushes = Q3_CopyLump( header, Q3_LUMP_BRUSHES, (void *) &q3_dbrushes, sizeof(q3_dbrush_t) );
-	q3_numbrushsides = Q3_CopyLump( header, Q3_LUMP_BRUSHSIDES, (void *) &q3_dbrushsides, sizeof(q3_dbrushside_t) );
+	if (igwarlord) {
+		q3r_numbrushsides = Q3_CopyLump( header, Q3_LUMP_BRUSHSIDES, (void*)&q3r_dbrushsides, sizeof(q3r_dbrushside_t) );
+		IGW_ConvertBSPData();
+	} else {
+		q3_numbrushsides = Q3_CopyLump(header, Q3_LUMP_BRUSHSIDES, (void*)&q3r_dbrushsides, sizeof(q3_dbrushside_t));
+	}
 	q3_numDrawVerts = Q3_CopyLump( header, Q3_LUMP_DRAWVERTS, (void *) &q3_drawVerts, sizeof(q3_drawVert_t) );
 	q3_numDrawSurfaces = Q3_CopyLump( header, Q3_LUMP_SURFACES, (void *) &q3_drawSurfaces, sizeof(q3_dsurface_t) );
 	q3_numFogs = Q3_CopyLump( header, Q3_LUMP_FOGS, (void *) &q3_dfogs, sizeof(q3_dfog_t) );

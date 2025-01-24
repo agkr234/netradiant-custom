@@ -243,7 +243,17 @@ static void FixBrushSides( const entity_t& e ){
 			bspBrushSide_t& side = bspBrushSides[ sideRef->side->outputNum ];
 
 			/* set drawsurface */
-			side.surfaceNum = ds.outputNum;
+			if (g_game->bspVersion == 48) {
+				if (!strcmp(ds.shaderInfo->shader, "textures/floor/spiralBlendMapRoads"))
+					side.surfaceNum = 0x401;
+				else if (!strcmp(ds.shaderInfo->shader, "noshader"))
+					side.surfaceNum = 0;
+				else
+					side.surfaceNum = 1;
+			}
+			else {
+				side.surfaceNum = ds.outputNum;
+			}
 			//%	Sys_FPrintf( SYS_VRB, "DS: %7d Side: %7d     ", ds.outputNum, sideRef->side->outputNum );
 
 			/* set shader */

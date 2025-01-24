@@ -176,9 +176,9 @@ int DDSGetInfo( ddsBuffer_t *dds, int *width, int *height, ddsPF_t *pf ){
 	if ( *( (int*) dds->magic ) != *( (int*) "DDS " ) ) {
 		return -1;
 	}
-	if ( DDSLittleLong( dds->size ) != 124 ) {
+	/*if (DDSLittleLong(dds->size) != 124) {
 		return -1;
-	}
+	}*/
 
 	/* extract width and height */
 	if ( width != NULL ) {

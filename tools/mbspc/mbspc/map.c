@@ -1319,8 +1319,14 @@ int LoadMapFromBSP(struct quakefile_s *qf)
 
 	idheader.ident = LittleLong(idheader.ident);
 	idheader.version = LittleLong(idheader.version);
+	if (igwarlord)
+	{
+		ResetMapLoading();
+		Q3_LoadMapFromBSP(qf);
+		Q3_FreeMaxBSP();
+	}
 	//QuakeLive BSP file
-	if (idheader.ident == QL_BSP_IDENT && idheader.version == QL_BSP_VERSION)
+	else if (idheader.ident == QL_BSP_IDENT && idheader.version == QL_BSP_VERSION)
 	{
 		ResetMapLoading();
 		Q3_LoadMapFromBSP(qf);

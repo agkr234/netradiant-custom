@@ -258,6 +258,51 @@ void LoadIBSPFile( const char *filename ){
 	}
 }
 
+void LoadIBSPFile_IGW(const char* filename) {
+	/* load the file */
+	MemBuffer file = LoadFile(filename);
+
+	ibspHeader_t* header = file.data();
+
+	/* swap the header (except the first 4 bytes) */
+	SwapBlock((int*)((byte*)header + 4), sizeof(*header) - 4);
+
+	/* make sure it matches the format we're trying to load */
+	if (!force && memcmp(header->ident, g_game->bspIdent, 4)) {
+		Error("%s is not a %s file", filename, g_game->bspIdent);
+	}
+	if (!force && header->version != g_game->bspVersion) {
+		Error("%s is version %d, not %d", filename, header->version, g_game->bspVersion);
+	}
+
+	/* load/convert lumps */
+	CopyLump((bspHeader_t*)header, LUMP_SHADERS, bspShaders);
+	CopyLump((bspHeader_t*)header, LUMP_MODELS, bspModels);
+	CopyLump((bspHeader_t*)header, LUMP_PLANES, bspPlanes);
+	CopyLump((bspHeader_t*)header, LUMP_LEAFS, bspLeafs);
+	CopyLump((bspHeader_t*)header, LUMP_NODES, bspNodes);
+	CopyLump((bspHeader_t*)header, LUMP_LEAFSURFACES, bspLeafSurfaces);
+	CopyLump((bspHeader_t*)header, LUMP_LEAFBRUSHES, bspLeafBrushes);
+	CopyLump((bspHeader_t*)header, LUMP_BRUSHES, bspBrushes);
+	CopyLump((bspHeader_t*)header, LUMP_BRUSHSIDES, bspBrushSides);
+	CopyLump<bspDrawVert_t, ibspDrawVert_t>((bspHeader_t*)header, LUMP_DRAWVERTS, bspDrawVerts);
+	CopyLump<bspDrawSurface_t, ibspDrawSurface_t>((bspHeader_t*)header, LUMP_SURFACES, bspDrawSurfaces);
+	CopyLump((bspHeader_t*)header, LUMP_FOGS, bspFogs);
+	CopyLump((bspHeader_t*)header, LUMP_DRAWINDEXES, bspDrawIndexes);
+	CopyLump((bspHeader_t*)header, LUMP_VISIBILITY, bspVisBytes);
+	CopyLump((bspHeader_t*)header, LUMP_LIGHTMAPS, bspLightBytes);
+	CopyLump((bspHeader_t*)header, LUMP_ENTITIES, bspEntData);
+	CopyLump<bspGridPoint_t, ibspGridPoint_t>((bspHeader_t*)header, LUMP_LIGHTGRID, bspGridPoints);
+
+	/* advertisements */
+	if (header->version == 47 && strEqual(g_game->arg, "quakelive")) { // quake live's bsp version minus wolf, et, etut
+		CopyLump((bspHeader_t*)header, LUMP_ADVERTISEMENTS, bspAds);
+	}
+	else {
+		bspAds.clear();
+	}
+}
+
 /*
    LoadIBSPorRBSPFilePartially()
    loads bsp file parts meaningful for autopacker
@@ -349,4 +394,59 @@ void WriteIBSPFile( const char *filename ){
 
 	/* close the file */
 	fclose( file );
+}
+
+void WriteIBSPFile_IGW(const char* filename) {
+	ibspHeader_t header{};
+
+	//%	Swapfile();
+
+	/* set up header */
+	memcpy(header.ident, g_game->bspIdent, 4);
+	header.version = LittleLong(g_game->bspVersion);
+
+	/* write initial header */
+	FILE* file = SafeOpenWrite(filename);
+	SafeWrite(file, &header, sizeof(header));    /* overwritten later */
+
+	{ /* add marker lump */
+		time_t t;
+		time(&t);
+		/* asctime adds an implicit trailing \n */
+		const auto marker = StringStream("I LOVE MY Q3MAP2 " Q3MAP_VERSION " on ", asctime(localtime(&t)));
+		AddLump(file, header.lumps[0], std::vector<char>(marker.cbegin(), marker.cend() + 1));
+	}
+
+	/* add lumps */
+	AddLump(file, header.lumps[LUMP_SHADERS], bspShaders);
+	AddLump(file, header.lumps[LUMP_PLANES], bspPlanes);
+	AddLump(file, header.lumps[LUMP_LEAFS], bspLeafs);
+	AddLump(file, header.lumps[LUMP_NODES], bspNodes);
+	AddLump(file, header.lumps[LUMP_BRUSHES], bspBrushes);
+	AddLump(file, header.lumps[LUMP_BRUSHSIDES], bspBrushSides);
+	AddLump(file, header.lumps[LUMP_LEAFSURFACES], bspLeafSurfaces);
+	AddLump(file, header.lumps[LUMP_LEAFBRUSHES], bspLeafBrushes);
+	AddLump(file, header.lumps[LUMP_MODELS], bspModels);
+	AddLump(file, header.lumps[LUMP_DRAWVERTS], std::vector<ibspDrawVert_t>(bspDrawVerts.begin(), bspDrawVerts.end()));
+	AddLump(file, header.lumps[LUMP_SURFACES], std::vector<ibspDrawSurface_t>(bspDrawSurfaces.begin(), bspDrawSurfaces.end()));
+	AddLump(file, header.lumps[LUMP_VISIBILITY], bspVisBytes);
+	AddLump(file, header.lumps[LUMP_LIGHTMAPS], bspLightBytes);
+	AddLump(file, header.lumps[LUMP_LIGHTGRID], std::vector<ibspGridPoint_t>(bspGridPoints.begin(), bspGridPoints.end()));
+	AddLump(file, header.lumps[LUMP_ENTITIES], bspEntData);
+	AddLump(file, header.lumps[LUMP_FOGS], bspFogs);
+	AddLump(file, header.lumps[LUMP_DRAWINDEXES], bspDrawIndexes);
+
+	/* advertisements */
+	AddLump(file, header.lumps[LUMP_ADVERTISEMENTS], bspAds);
+
+	/* emit bsp size */
+	const int size = ftell(file);
+	Sys_Printf("Wrote %.1f MB (%d bytes)\n", (float)size / (1024 * 1024), size);
+
+	/* write the completed header */
+	fseek(file, 0, SEEK_SET);
+	SafeWrite(file, &header, sizeof(header));
+
+	/* close the file */
+	fclose(file);
 }

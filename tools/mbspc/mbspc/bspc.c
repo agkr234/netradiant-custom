@@ -76,6 +76,7 @@ qboolean	cancelconversion;	//true if the conversion is being cancelled
 qboolean	noliquids;			//no liquids when writing map file
 qboolean	forcesidesvisible;	//force all brush sides to be visible when loaded from bsp
 qboolean	capsule_collision = 0;
+qboolean	igwarlord;
 
 /*
 //===========================================================================
@@ -748,6 +749,10 @@ int main (int argc, char **argv)
 			if (i + 1 >= argc) {i = 0; break;}
 			comp = COMP_AASOPTIMIZE;
 			qfiles = GetArgumentFiles(argc, argv, &i, "aas");
+		} //end else if
+		else if (!stricmp(argv[i], "-igwarlord"))
+		{
+			igwarlord = true;
 		} //end else if
 #endif //ME
 		else

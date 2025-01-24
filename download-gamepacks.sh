@@ -157,6 +157,7 @@ pack DarkPlacesPack    GPL         svn    svn://svn.icculus.org/gtkradiant-gamep
 pack Doom3Pack         proprietary svn    svn://svn.icculus.org/gtkradiant-gamepacks/Doom3Pack/branches/1.5/
 pack ETPack            proprietary svn    svn://svn.icculus.org/gtkradiant-gamepacks/ETPack/branches/1.5/
 pack Heretic2Pack      proprietary svn    svn://svn.icculus.org/gtkradiant-gamepacks/Her2Pack/branches/1.5/
+pack IGWarlordPack	   unknown     git    https://github.com/agkr234/igwarlord-mapeditor-support.git
 pack JediAcademyPack   proprietary svn    svn://svn.icculus.org/gtkradiant-gamepacks/JAPack/branches/1.5/ #600Mb dl
 #pack JediOutcastPack  proprietary svn    svn://svn.icculus.org/gtkradiant-gamepacks/JK2Pack/branches/1.4/ #not 1.5 pack
 #pack KingpinPack      unknown     zip1   http://download.kingpin.info/kingpin/editing/maps/map_editors/NetRadiant/addon/Kingpinpack.zip #dl error: wrong certificate

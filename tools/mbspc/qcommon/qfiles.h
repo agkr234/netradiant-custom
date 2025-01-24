@@ -415,6 +415,7 @@ typedef struct {
 
 #define BSP_VERSION			46
 #define BSP_VERSION_QL			47 // quakelive :sss
+#define BSP_VERSION_IGW			48
 
 // there shouldn't be any problem with increasing these values at the
 // expense of more memory allocation in the utilities
@@ -534,6 +535,12 @@ typedef struct {
 	int			planeNum;			// positive plane side faces out of the leaf
 	int			shaderNum;
 } dbrushside_t;
+
+typedef struct {
+	int			planeNum;			// positive plane side faces out of the leaf
+	int			shaderNum;
+	int         surfaceNum;
+} drbrushside_t;
 
 typedef struct {
 	int			firstSide;
