@@ -57,7 +57,13 @@ pack()
 				;;
 			git)
 				cd "games/$pack"
-				$GIT pull || true
+				if [ -z "$1" ]; then
+					$GIT pull || true
+				else
+					$ECHO "Version: $1"
+					$GIT fetch --all --tags
+					$GIT checkout "$1" || true
+				fi
 				cd ../..
 				;;
 		esac
@@ -138,6 +144,10 @@ pack()
 		git)
 			cd games
 			$GIT clone "$source" "$pack" || true
+			if [ ! -z "$1" ]; then
+				$ECHO "Version: $1"
+				$GIT checkout "$1" || true
+			fi
 			cd ..
 			;;
 	esac
